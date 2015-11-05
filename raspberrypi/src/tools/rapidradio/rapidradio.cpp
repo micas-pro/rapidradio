@@ -85,7 +85,7 @@ struct Settings
 	bool verbose;
 	string byteSpecifier;
 	bool newlineAfterPacket;
-	bool ignoreNumbering;
+	bool packetNumbering;
 };
 
 bool parseParams(const int argc, const char **argv, Settings &settings)
@@ -98,7 +98,7 @@ bool parseParams(const int argc, const char **argv, Settings &settings)
 	settings.verbose = false;
 	settings.byteSpecifier = "%c";
 	settings.newlineAfterPacket = false;
-	settings.ignoreNumbering = false;
+	settings.packetNumbering = true;
 	
 	for (int i=1; i<argc; i++)
 	{		
@@ -117,7 +117,7 @@ bool parseParams(const int argc, const char **argv, Settings &settings)
 		}
 		else if (argv[i] == string("-i"))
 		{
-			settings.ignoreNumbering = true;
+			settings.packetNumbering = false;
 		}
 		else if (string(argv[i]).substr(0, 3) == "-c=")
 		{
