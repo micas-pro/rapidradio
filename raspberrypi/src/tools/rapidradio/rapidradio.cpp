@@ -85,6 +85,7 @@ struct Settings
 	bool verbose;
 	string byteSpecifier;
 	bool newlineAfterPacket;
+	bool ignoreNumbering;
 };
 
 bool parseParams(const int argc, const char **argv, Settings &settings)
@@ -97,6 +98,7 @@ bool parseParams(const int argc, const char **argv, Settings &settings)
 	settings.verbose = false;
 	settings.byteSpecifier = "%c";
 	settings.newlineAfterPacket = false;
+	settings.ignoreNumbering = false;
 	
 	for (int i=1; i<argc; i++)
 	{		
@@ -112,6 +114,10 @@ bool parseParams(const int argc, const char **argv, Settings &settings)
 			{
 				settings.targetAddress = adr;
 			}
+		}
+		else if (argv[i] == string("-i"))
+		{
+			settings.ignoreNumbering = true;
 		}
 		else if (string(argv[i]).substr(0, 3) == "-c=")
 		{
@@ -179,12 +185,13 @@ void usage()
 {
 	printf("rapidradio command-line tool\n\n");
 	printf("Usage:\n");
-	printf("sudo ./rapidradio [-l] [-ld] [-v] [-x] [-n] [-a=4_byte_hex_address] [-c=channel] [-nack] [-rN=1_byte_value]\n\n");
+	printf("sudo ./rapidradio [-l] [-ld] [-v] [-x] [-n] [-i] [-a=4_byte_hex_address] [-c=channel] [-nack] [-rN=1_byte_value]\n\n");
 	printf("-l\t\t\tListen mode - rapidradio will listen for incomming packets send to address specified by -a and channel set by -c.\n");
 	printf("-ld\t\t\tListen mode with discarded output - rapidradio will just print a dot '.' every ~10KiB received.\n");
 	printf("-v\t\t\tVerbose output.\n");
 	printf("-x\t\t\tPrint received bytes as 2-character hex - useful when debugging or sniffing received radio packets.\n");
 	printf("-n\t\t\tPrint a newline after each received packet. Useful together with the -x option.\n");
+	printf("-i\t\t\tIgnore packet number byte. Use for real raw transmissions.\n");
 	printf("-a=address\t\tIt's a 4-byte hex address of target device (when sending) or this device address (when listening). Example: -a=123456AB\n");
 	printf("-c=channel\t\tRadio channel number, a value from range: 1 to 83.\n");
 	printf("-nack\t\t\tDon't expect ACKs when sending. Speeds up transmission but gives no guarantee that all packets reach the target device.\n");
@@ -197,6 +204,7 @@ void listen(Settings &settings)
 	if (settings.verbose) fprintf(stderr, "Listening...\n");
 	startListening(settings.channel, settings.targetAddress);
 	int32_t packetCount = -1;
+	uint8_t packetNumber = 0;
 	bool stop = false;
 	while (!signaled && !stop)
 	{
@@ -214,7 +222,7 @@ void listen(Settings &settings)
 		uint8_t length = 0;
 		
 		// process all packets (if any)
-		// 'while' loop instead of just 'if' statement because the RFM73 can buffer up to 3 received packets
+		// 'while' loop instead of just 'if' statement because the RFM7x can buffer up to 3 received packets
 		while (received(buff, length) && length)
 		{
 			++packetCount;
@@ -238,16 +246,25 @@ void listen(Settings &settings)
 					break;
 				}
 				
-				// check packet number to discard duplicated packets (rare, but possible when ACK is used)
-				if (buff[0] < (uint8_t)packetCount)
-				{				
-					if (settings.verbose) fprintf(stderr, "Duplicated packet %u, should be %u\n", buff[0], (uint8_t)packetCount);
-					packetCount--;
-					continue;
+				if (settings.packetNumbering)
+				{
+					// check packet number if packets are missing 										
+					if (buff[0] > packetNumber)
+					{				
+						if (settings.verbose) fprintf(stderr, "Missing packet(s). Got packet %u, expected %u\n", buff[0], packetNumber);
+						packetNumber = buff[0];
+					}				
+					// check packet number to discard duplicated packets (rare, but possible when ACK is used)										
+					else if (buff[0] < packetNumber)
+					{				
+						if (settings.verbose) fprintf(stderr, "Duplicated packet %u, expected %u\n", buff[0], packetNumber);
+						packetCount--;
+						continue;
+					}
 				}
 				
 				// skip first byte
-				for(uint8_t i=1; i<length; i++)
+				for(uint8_t i = settings.packetNumbering ? 1 : 0; i<length; i++)
 				{
 					printf(settings.byteSpecifier.c_str(), buff[i]);
 				}
@@ -256,6 +273,8 @@ void listen(Settings &settings)
 				{
 					printf("\n");
 				}
+				
+				packetNumber++;
 			}	
 			
 			// print dot '.' every ~10 KiB
@@ -283,7 +302,7 @@ void transmit(Settings &settings)
 	
 	if (settings.verbose) fprintf(stderr, "Read %uB (%uKiB, %uMiB) from input.\n", input.size(), input.size()/1024U, input.size()/(1024U*1024U));	
 	
-	TransmitResult result = send(settings.channel, settings.targetAddress, input.begin(), input.end(), settings.ack, true, 0);
+	TransmitResult result = send(settings.channel, settings.targetAddress, input.begin(), input.end(), settings.ack, settings.packetNumbering, 0);
 	if (result.status != Success)
 	{
 		fprintf(stderr, "An error occured while sending! (%u)\n", (int)result.status);
@@ -327,14 +346,14 @@ int main(const int argc, const char **argv)
 	    return 1;
 	}
 	
-	// use custom RFM73 register settings (if any)
+	// use custom RFM7x register settings (if any)
 	for (size_t i=0;i<settings.registers.size();i++)
 	{
 		if (settings.verbose) fprintf(stderr, "REG%u = %.2X\n", settings.registers[i].first, settings.registers[i].second);
-		writeRegVal(RFM73_CMD_WRITE_REG | settings.registers[i].first, settings.registers[i].second); 
+		writeRegVal(RFM7x_CMD_WRITE_REG | settings.registers[i].first, settings.registers[i].second); 
 	}
 				
-	if (settings.verbose) fprintf(stderr, "Address = %.8X\nChannel = %u\n", settings.targetAddress, settings.channel);
+	if (settings.verbose) fprintf(stderr, "Address = %.8X\nChannel = %u\nPacket numbering %s\n", settings.targetAddress, settings.channel, settings.packetNumbering ? "enabled" : "disabled");
 		
 	turnOn();
 	

@@ -48,19 +48,19 @@ namespace rapidradio
 bool initRegisters();
 
 //commands
-const uint8_t PROGMEM RFM73_cmd_adrRX0[] = { (0x20 | 0x0A), 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
-const uint8_t PROGMEM RFM73_cmd_adrTX[]  = { (0x20 | 0x10), 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
-const uint8_t PROGMEM RFM73_cmd_adrRX1[] = { (0x20 | 0x0B), 0x35, 0x43, 0x10, 0x10, 0x02};
-const uint8_t PROGMEM RFM73_cmd_switch_cfg[] = { 0x50, 0x53 }; // 
-const uint8_t PROGMEM RFM73_cmd_flush_rx[] = { 0xe2, 0x00 }; // flush RX FIFO
-const uint8_t PROGMEM RFM73_cmd_flush_tx[] = { 0xe1, 0x00 }; // flush TX FIFO
-const uint8_t PROGMEM RFM73_cmd_activate[] = { 0x50, 0x73 }; // 
-const uint8_t PROGMEM RFM73_cmd_tog1[] = { (0x20 | 0x04), 0xd9 | 0x06, 0x9e, 0x86, 0x0b };
-const uint8_t PROGMEM RFM73_cmd_tog2[] = { (0x20 | 0x04), 0xd9 & ~0x06, 0x9e, 0x86, 0x0b}; 
+const uint8_t PROGMEM RFM7x_cmd_adrRX0[] = { (0x20 | 0x0A), 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
+const uint8_t PROGMEM RFM7x_cmd_adrTX[]  = { (0x20 | 0x10), 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
+const uint8_t PROGMEM RFM7x_cmd_adrRX1[] = { (0x20 | 0x0B), 0x35, 0x43, 0x10, 0x10, 0x02};
+const uint8_t PROGMEM RFM7x_cmd_switch_cfg[] = { 0x50, 0x53 }; // 
+const uint8_t PROGMEM RFM7x_cmd_flush_rx[] = { 0xe2, 0x00 }; // flush RX FIFO
+const uint8_t PROGMEM RFM7x_cmd_flush_tx[] = { 0xe1, 0x00 }; // flush TX FIFO
+const uint8_t PROGMEM RFM7x_cmd_activate[] = { 0x50, 0x73 }; // 
+const uint8_t PROGMEM RFM7x_cmd_tog1[] = { (0x20 | 0x04), 0xd9 | 0x06, 0x9e, 0x86, 0x0b };
+const uint8_t PROGMEM RFM7x_cmd_tog2[] = { (0x20 | 0x04), 0xd9 & ~0x06, 0x9e, 0x86, 0x0b}; 
 
 //RFM73
 //************ Bank0 register initialization commands
-const uint8_t PROGMEM RFM73_bank0Init[][2] = {
+const uint8_t PROGMEM RFM7x_bank0Init[][2] = {
   // address data
   { (0x20 | 0x00), 0x03 }, //Disable CRC ,CRC=1byte, POWER UP, RX
   { (0x20 | 0x01), 0x3F }, //Enable auto acknowledgement data pipe0-5
@@ -88,13 +88,13 @@ const uint8_t PROGMEM RFM73_bank0Init[][2] = {
 };
 
 //************ Bank1 register initialization commands
-const uint8_t PROGMEM RFM73_bank1Init[][5] = {
+const uint8_t PROGMEM RFM7x_bank1Init[][5] = {
   { (0x20 | 0x00), 0x40, 0x4B, 0x01, 0xE2 },
   { (0x20 | 0x01), 0xC0, 0x4B, 0x00, 0x00 },
   { (0x20 | 0x02), 0xD0, 0xFC, 0x8C, 0x02 },
   { (0x20 | 0x03), 0x99, 0x00, 0x39, 0x41 },
-  { (0x20 | 0x04), 0xD9, 0x96, 0x82, 0x1B },
-  { (0x20 | 0x05), 0x24, 0x06, 0x7F, 0xA6 },
+  { (0x20 | 0x04), 0xDB, 0x82, 0x96, 0xF9 },
+  { (0x20 | 0x05), 0xB6, 0x0F, 0x06, 0x24 },
   { (0x20 | 0x06), 0x00, 0x00, 0x00, 0x00 },
   { (0x20 | 0x07), 0x00, 0x00, 0x00, 0x00 },
   { (0x20 | 0x08), 0x00, 0x00, 0x00, 0x00 },
@@ -102,11 +102,11 @@ const uint8_t PROGMEM RFM73_bank1Init[][5] = {
   { (0x20 | 0x0a), 0x00, 0x00, 0x00, 0x00 },
   { (0x20 | 0x0b), 0x00, 0x00, 0x00, 0x00 },
   { (0x20 | 0x0C), 0x00, 0x12, 0x73, 0x00 },
-  { (0x20 | 0x0D), 0x46, 0xb4, 0x80, 0x00 }
+  { (0x20 | 0x0D), 0x36, 0xb4, 0x80, 0x00 }
 };
 
 //Bank1 register 14
-const uint8_t PROGMEM RFM73_bank1R0EInit[] = {
+const uint8_t PROGMEM RFM7x_bank1R0EInit[] = {
   (0x20 | 0x0E), 0x41, 0x20, 0x08, 0x04, 0x81, 0x20, 0xCF, 0xF7, 0xFE, 0xFF, 0xFF
 };
 
@@ -167,7 +167,7 @@ bool init()
 	
 	SPI_MasterInit();
 	
-	_delay_ms(RFM73_BEGIN_INIT_WAIT_MS);
+	_delay_ms(RFM7x_BEGIN_INIT_WAIT_MS);
 	return initRegisters();
 }
 
@@ -178,36 +178,36 @@ bool initRegisters()
 
 	// !! The last two regs in the bank0Init list will be handled later
 	for (int i = 0; i < 20; i++)
-	writeRegVal(pgm_read_byte(&RFM73_bank0Init[i][0]), pgm_read_byte(&RFM73_bank0Init[i][1]));
+	writeRegVal(pgm_read_byte(&RFM7x_bank0Init[i][0]), pgm_read_byte(&RFM7x_bank0Init[i][1]));
 
 	// init address registers in bank 0
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_adrRX0, sizeof(RFM73_cmd_adrRX0));
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_adrRX1, sizeof(RFM73_cmd_adrRX1));
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_adrTX, sizeof(RFM73_cmd_adrTX));
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_adrRX0, sizeof(RFM7x_cmd_adrRX0));
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_adrRX1, sizeof(RFM7x_cmd_adrRX1));
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_adrTX, sizeof(RFM7x_cmd_adrTX));
 
 	// activate Feature register
-	if(!readRegVal(RFM73_REG_FEATURE))
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_activate, sizeof(RFM73_cmd_activate));
+	if(!readRegVal(RFM7x_REG_FEATURE))
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_activate, sizeof(RFM7x_cmd_activate));
 
 	// now set Registers 1D and 1C
-	writeRegVal(pgm_read_byte(&RFM73_bank0Init[22][0]), pgm_read_byte(&RFM73_bank0Init[22][1]));
-	writeRegVal(pgm_read_byte(&RFM73_bank0Init[21][0]), pgm_read_byte(&RFM73_bank0Init[21][1]));
+	writeRegVal(pgm_read_byte(&RFM7x_bank0Init[22][0]), pgm_read_byte(&RFM7x_bank0Init[22][1]));
+	writeRegVal(pgm_read_byte(&RFM7x_bank0Init[21][0]), pgm_read_byte(&RFM7x_bank0Init[21][1]));
 
 	// init bank 1 registers
 	selectBank(1);
 
 	for (int i=0; i < 14; i++)
-	writeRegPgmBuf((uint8_t *)RFM73_bank1Init[i], sizeof(RFM73_bank1Init[i]));
+	writeRegPgmBuf((uint8_t *)RFM7x_bank1Init[i], sizeof(RFM7x_bank1Init[i]));
 
 	// set ramp curve
-	writeRegPgmBuf((uint8_t *)RFM73_bank1R0EInit, sizeof(RFM73_bank1R0EInit));
+	writeRegPgmBuf((uint8_t *)RFM7x_bank1R0EInit, sizeof(RFM7x_bank1R0EInit));
 
 	// do we have to toggle some bits here like in the example code?
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_tog1, sizeof(RFM73_cmd_tog1));
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_tog2, sizeof(RFM73_cmd_tog2));
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_tog1, sizeof(RFM7x_cmd_tog1));
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_tog2, sizeof(RFM7x_cmd_tog2));
 
 
-	_delay_ms(RFM73_END_INIT_WAIT_MS);
+	_delay_ms(RFM7x_END_INIT_WAIT_MS);
 
 	//Check the ChipID
 	if (readRegVal(0x08) != 0x63)
@@ -232,25 +232,25 @@ void selectBank(uint8_t bank)
 	if(bank) 
 	{
 		if(!tmp)
-			writeRegPgmBuf((uint8_t *)RFM73_cmd_switch_cfg, sizeof(RFM73_cmd_switch_cfg));
+			writeRegPgmBuf((uint8_t *)RFM7x_cmd_switch_cfg, sizeof(RFM7x_cmd_switch_cfg));
 	} 
 	else 
 	{
 		if(tmp)
-			writeRegPgmBuf((uint8_t *)RFM73_cmd_switch_cfg, sizeof(RFM73_cmd_switch_cfg));
+			writeRegPgmBuf((uint8_t *)RFM7x_cmd_switch_cfg, sizeof(RFM7x_cmd_switch_cfg));
 	}
 }
 
 void setModeRX(void)
 {
 	uint8_t val;
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_flush_rx, sizeof(RFM73_cmd_flush_rx)); 
-	val = readRegVal(RFM73_REG_STATUS);
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_STATUS, val); 
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_flush_rx, sizeof(RFM7x_cmd_flush_rx)); 
+	val = readRegVal(RFM7x_REG_STATUS);
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_STATUS, val); 
 	CE_LOW;
-	val=readRegVal(RFM73_REG_CONFIG);
-	val |= RFM73_PIN_PRIM_RX;
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_CONFIG, val); 
+	val=readRegVal(RFM7x_REG_CONFIG);
+	val |= RFM7x_PIN_PRIM_RX;
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_CONFIG, val); 
 	CE_HIGH;
 }
 
@@ -258,13 +258,13 @@ void setModeRX(void)
 void setModeTX(void) 
 {
 	uint8_t val;
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_flush_tx, sizeof(RFM73_cmd_flush_tx));
-	val = readRegVal(RFM73_REG_STATUS); 
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_STATUS, val);
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_flush_tx, sizeof(RFM7x_cmd_flush_tx));
+	val = readRegVal(RFM7x_REG_STATUS); 
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_STATUS, val);
 	CE_LOW;
-	val=readRegVal(RFM73_REG_CONFIG);
-	val &= ~RFM73_PIN_PRIM_RX;
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_CONFIG, val); 
+	val=readRegVal(RFM7x_REG_CONFIG);
+	val &= ~RFM7x_PIN_PRIM_RX;
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_CONFIG, val); 
 	
 	// Don't turn the radio on to save power
 	//CE_HIGH;
@@ -272,49 +272,49 @@ void setModeTX(void)
 
 uint8_t getMode(void) 
 {
-	return readRegVal(RFM73_REG_CONFIG) & RFM73_PIN_PRIM_RX;
+	return readRegVal(RFM7x_REG_CONFIG) & RFM7x_PIN_PRIM_RX;
 }
 
 void setChannel(uint8_t cnum) 
 {
-	writeRegVal( RFM73_CMD_WRITE_REG | RFM73_REG_RF_CH, cnum);
+	writeRegVal( RFM7x_CMD_WRITE_REG | RFM7x_REG_RF_CH, cnum);
 }
 
 uint8_t getChannel(void) 
 {
-	return readRegVal(RFM73_REG_RF_CH);
+	return readRegVal(RFM7x_REG_RF_CH);
 }
 
 void setPower(uint8_t pwr) 
 {
 	if (pwr > 3) return;
-	uint8_t tmp = readRegVal(RFM73_REG_RF_SETUP);
+	uint8_t tmp = readRegVal(RFM7x_REG_RF_SETUP);
 	tmp &= 0xF9;
 	tmp |= pwr << 1;
 	
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_RF_SETUP, tmp);
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_RF_SETUP, tmp);
 }
 
 uint8_t readRegVal(uint8_t cmd)  
 {
 	uint8_t res;
 	CSN_LOW;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	transmitSPI(cmd);
 	res = transmitSPI(0);
 	CSN_HIGH;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	return res;
 }
 
 uint8_t writeRegVal(uint8_t cmd, uint8_t val) 
 {	
 	CSN_LOW;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	transmitSPI(cmd);
 	transmitSPI(val);
 	CSN_HIGH;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	return 1;
 }
 
@@ -322,12 +322,12 @@ void readRegBuf(uint8_t reg, uint8_t * buf, uint8_t len)
 {
 	uint8_t byte_ctr;
 	CSN_LOW;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	transmitSPI(reg); 
 	for(byte_ctr = 0; byte_ctr < len; byte_ctr++)
 		buf[byte_ctr] = transmitSPI(0); 
 	CSN_HIGH;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 }
 
 
@@ -335,10 +335,10 @@ void readRegBuf(uint8_t reg, uint8_t * buf, uint8_t len)
 uint8_t writeRegPgmBuf(uint8_t * cmdbuf, uint8_t len) 
 {
 	CSN_LOW;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	while(len--) transmitSPI(pgm_read_byte(cmdbuf++));
 	CSN_HIGH;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	return 1;
 }
 
@@ -346,11 +346,11 @@ uint8_t writeRegCmdBuf(uint8_t cmd, uint8_t * buf, uint8_t len)
 {
 
 	CSN_LOW;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	transmitSPI(cmd);
 	while(len--) transmitSPI(*(buf++));	
 	CSN_HIGH;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	return 1;
 }
 
@@ -366,25 +366,25 @@ uint8_t configRxPipe(uint8_t pipe_nr, uint8_t *adr, uint8_t plLen, uint8_t en_aa
 
 	// write address
 	if(nr<2)      // full length for rx pipe 0 an 1
-		writeRegCmdBuf(RFM73_CMD_WRITE_REG | (RFM73_REG_RX_ADDR_P0 + nr), adr, 5);
+		writeRegCmdBuf(RFM7x_CMD_WRITE_REG | (RFM7x_REG_RX_ADDR_P0 + nr), adr, 5);
 	else // only LSB for pipes 2..5
-		writeRegVal(RFM73_CMD_WRITE_REG | (RFM73_REG_RX_ADDR_P0 + nr), adr[0]); 
+		writeRegVal(RFM7x_CMD_WRITE_REG | (RFM7x_REG_RX_ADDR_P0 + nr), adr[0]); 
 
 	// static
 	if (plLen) {
 		// set payload len
-		writeRegVal(RFM73_CMD_WRITE_REG | (RFM73_REG_RX_PW_P0 + nr), plLen);
+		writeRegVal(RFM7x_CMD_WRITE_REG | (RFM7x_REG_RX_PW_P0 + nr), plLen);
 		// set EN_AA bit
-		tmp = readRegVal(RFM73_REG_EN_AA);
+		tmp = readRegVal(RFM7x_REG_EN_AA);
 		if (en_aa)
 		tmp |= 1 << nr;
 		else
 		tmp &= ~(1 << nr);
-		writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_EN_AA, tmp);
+		writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_EN_AA, tmp);
 		// clear DPL bit
-		tmp = readRegVal(RFM73_REG_DYNPD);
+		tmp = readRegVal(RFM7x_REG_DYNPD);
 		tmp &= ~(1 << nr);
-		writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_DYNPD, tmp);        
+		writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_DYNPD, tmp);        
 		// set Enable pipe bit
 		enableRxPipe(nr);
 	}
@@ -392,15 +392,15 @@ uint8_t configRxPipe(uint8_t pipe_nr, uint8_t *adr, uint8_t plLen, uint8_t en_aa
 	else 
 	{
 		// set payload len to default
-		writeRegVal(RFM73_CMD_WRITE_REG | (RFM73_REG_RX_PW_P0 + nr), 0x20);
+		writeRegVal(RFM7x_CMD_WRITE_REG | (RFM7x_REG_RX_PW_P0 + nr), 0x20);
 		// set EN_AA bit
-		tmp = readRegVal(RFM73_REG_EN_AA);
+		tmp = readRegVal(RFM7x_REG_EN_AA);
 		tmp |= 1 << nr;
-		writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_EN_AA, tmp);
+		writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_EN_AA, tmp);
 		// set DPL bit
-		tmp = readRegVal(RFM73_REG_DYNPD);
+		tmp = readRegVal(RFM7x_REG_DYNPD);
 		tmp |= 1 << nr;
-		writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_DYNPD, tmp);
+		writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_DYNPD, tmp);
 		// set Enable pipe bit
 		enableRxPipe(nr);
 	}
@@ -413,9 +413,9 @@ void enableRxPipe(uint8_t pipe_nr)
 	if (nr > 5) return;
 	uint8_t tmp;
 	// set Enable pipe bit
-	tmp = readRegVal(RFM73_REG_EN_RXADDR);
+	tmp = readRegVal(RFM7x_REG_EN_RXADDR);
 	tmp |= 1 << nr;
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_EN_RXADDR, tmp);
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_EN_RXADDR, tmp);
 }
 
 void disableRxPipe(uint8_t pipe_nr) 
@@ -424,25 +424,25 @@ void disableRxPipe(uint8_t pipe_nr)
 	if (nr > 5) return;
 	uint8_t tmp;
 	// set Enable pipe bit
-	tmp = readRegVal(RFM73_REG_EN_RXADDR);
+	tmp = readRegVal(RFM7x_REG_EN_RXADDR);
 	tmp &= ~(1 << nr);
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_EN_RXADDR, tmp);
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_EN_RXADDR, tmp);
 }
 
 void configTxPipe(uint8_t * adr, uint8_t pltype) 
 {
 	// write TX address
-	writeRegCmdBuf(RFM73_CMD_WRITE_REG | RFM73_REG_TX_ADDR, adr, 5);
+	writeRegCmdBuf(RFM7x_CMD_WRITE_REG | RFM7x_REG_TX_ADDR, adr, 5);
 	// write RX0 address
-	writeRegCmdBuf(RFM73_CMD_WRITE_REG | RFM73_REG_RX_ADDR_P0, adr, 5);
+	writeRegCmdBuf(RFM7x_CMD_WRITE_REG | RFM7x_REG_RX_ADDR_P0, adr, 5);
 	// set static or dynamic payload
 	uint8_t tmp;
-	tmp = readRegVal(RFM73_REG_DYNPD);
+	tmp = readRegVal(RFM7x_REG_DYNPD);
 	if(pltype == TX_DPL) // dynamic
 	tmp |= 1;
 	else  
 	tmp &= ~(1 << 0);
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_DYNPD, tmp);
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_DYNPD, tmp);
 }
 
 uint8_t sendPayload(const uint8_t * payload, const uint8_t _len, const uint8_t toAck)
@@ -452,26 +452,26 @@ uint8_t sendPayload(const uint8_t * payload, const uint8_t _len, const uint8_t t
 	
 	// check TX_FIFO
 	uint8_t status;
-	status = readRegVal(RFM73_REG_FIFO_STATUS); 
-	if (status & RFM73_FIFO_STATUS_TX_FULL) 
+	status = readRegVal(RFM7x_REG_FIFO_STATUS); 
+	if (status & RFM7x_FIFO_STATUS_TX_FULL) 
 	{
 		return 0;
 	}
 
 	// send payload
 	CSN_LOW;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	if(toAck == -1)
-		transmitSPI(RFM73_CMD_W_ACK_PAYLOAD);
+		transmitSPI(RFM7x_CMD_W_ACK_PAYLOAD);
 	else if (toAck == 0)
-		transmitSPI(RFM73_CMD_W_TX_PAYLOAD_NOACK);
+		transmitSPI(RFM7x_CMD_W_TX_PAYLOAD_NOACK);
 	else
-		transmitSPI(RFM73_CMD_WR_TX_PLOAD);
+		transmitSPI(RFM7x_CMD_WR_TX_PLOAD);
 		
 	uint8_t len = _len;
 	while(len--) transmitSPI(*(payload++));
 	CSN_HIGH;
-	_delay_ms(RFM73_CS_DELAY);
+	_delay_ms(RFM7x_CS_DELAY);
 	return 1;
 }
 
@@ -480,17 +480,17 @@ uint8_t receivePayload(uint8_t *payload)
 	uint8_t len;
 	// check RX_FIFO
 	uint8_t status;
-	status = readRegVal(RFM73_REG_STATUS);
-	if (status & RFM73_IRQ_STATUS_RX_DR) { // RX_DR
+	status = readRegVal(RFM7x_REG_STATUS);
+	if (status & RFM7x_IRQ_STATUS_RX_DR) { // RX_DR
 		
 		uint8_t fifo_sta;
-		len = readRegVal(RFM73_CMD_RX_PL_WID); // Payload width
-		readRegBuf(RFM73_CMD_RD_RX_PLOAD, payload, len);
-		fifo_sta = readRegVal(RFM73_REG_FIFO_STATUS);
+		len = readRegVal(RFM7x_CMD_RX_PL_WID); // Payload width
+		readRegBuf(RFM7x_CMD_RD_RX_PLOAD, payload, len);
+		fifo_sta = readRegVal(RFM7x_REG_FIFO_STATUS);
 		
-		if (fifo_sta & RFM73_FIFO_STATUS_RX_EMPTY) {
+		if (fifo_sta & RFM7x_FIFO_STATUS_RX_EMPTY) {
 			status|= 0x40 & 0xCF; // clear status bit rx_dr
-			writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_STATUS, status); 
+			writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_STATUS, status); 
 		}
 		return len;
 	}
@@ -502,12 +502,12 @@ uint8_t receivePayload(uint8_t *payload)
 
 void flushTxFIFO() 
 {
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_flush_tx, sizeof(RFM73_cmd_flush_tx));
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_flush_tx, sizeof(RFM7x_cmd_flush_tx));
 }
 
 void flushRxFIFO() 
 {
-	writeRegPgmBuf((uint8_t *)RFM73_cmd_flush_rx, sizeof(RFM73_cmd_flush_rx));
+	writeRegPgmBuf((uint8_t *)RFM7x_cmd_flush_rx, sizeof(RFM7x_cmd_flush_rx));
 }
 
 void setCE()
@@ -532,28 +532,28 @@ void resetCSN()
 
 void turnOn()
 {
-	uint8_t status = readRegVal(RFM73_REG_STATUS);
+	uint8_t status = readRegVal(RFM7x_REG_STATUS);
 	status |= PWR_BIT;
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_STATUS, status);
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_STATUS, status);
 }
 
 void turnOff()
 {
-	uint8_t status = readRegVal(RFM73_REG_STATUS);
+	uint8_t status = readRegVal(RFM7x_REG_STATUS);
 	status &= ~PWR_BIT;
-	writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_STATUS, status);
+	writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_STATUS, status);
 	CE_LOW;
 }
 
 bool checkStatusForMissingIRQ(uint8_t &status)
 {
-	status = readRegVal(RFM73_REG_STATUS);
+	status = readRegVal(RFM7x_REG_STATUS);
 	return status != 14;
 }
 
 TransmitResult internalSendPacket(const uint8_t *buff, const size_t &length, const uint32_t maxTimeoutUs, bool requestAck)
 {
-	const size_t toSendLength = MIN(length, RFM73_MAX_PACKET_LEN);
+	const size_t toSendLength = MIN(length, RFM7x_MAX_PACKET_LEN);
 	sendPayload(buff, toSendLength, requestAck ? 1 : 0);
 	
 	TransmitResult result;
@@ -576,20 +576,20 @@ TransmitResult internalSendPacket(const uint8_t *buff, const size_t &length, con
 	
 	if (readStatus)
 	{
-		status = readRegVal(RFM73_REG_STATUS);
+		status = readRegVal(RFM7x_REG_STATUS);
 	}
 	
-	if (status & RFM73_IRQ_STATUS_TX_DS)
+	if (status & RFM7x_IRQ_STATUS_TX_DS)
 	{
 		result.status = Success;
 		result.bytesSent = toSendLength;
 	}
-	else if (status & RFM73_IRQ_STATUS_MAX_RT)
+	else if (status & RFM7x_IRQ_STATUS_MAX_RT)
 	{
 		result.status = MaxRT;
 		result.bytesSent = 0;
 	}
-	else if (status & RFM73_IRQ_STATUS_TX_FULL)
+	else if (status & RFM7x_IRQ_STATUS_TX_FULL)
 	{
 		result.status = FifoFull;
 		result.bytesSent = 0;
@@ -605,7 +605,7 @@ TransmitResult internalSendPacket(const uint8_t *buff, const size_t &length, con
 	//if (result.status != Success) it's better to always clear the error flags
 	{
 		// Reset error flags
-		writeRegVal(RFM73_CMD_WRITE_REG | RFM73_REG_STATUS, status);
+		writeRegVal(RFM7x_CMD_WRITE_REG | RFM7x_REG_STATUS, status);
 	}
 	
 	return result;
@@ -620,7 +620,7 @@ TransmitResult& operator +=(TransmitResult &a, const TransmitResult b)
 
 TransmitResult internalSend(const uint8_t *buff, const size_t &length, bool requestAck, bool usePacketNumber, const uint8_t firstPacketNumber)
 {	
-	uint8_t setupRetr = readRegVal(RFM73_REG_SETUP_RETR);
+	uint8_t setupRetr = readRegVal(RFM7x_REG_SETUP_RETR);
 	uint32_t maxTimeoutUs = (uint32_t)(((setupRetr & 0b11110000) >> 4) + 1) * 250UL * (uint32_t)(setupRetr & 0b00001111);
 	maxTimeoutUs += maxTimeoutUs/2UL;
 	
@@ -633,7 +633,7 @@ TransmitResult internalSend(const uint8_t *buff, const size_t &length, bool requ
 	result.bytesSent = 0;
 	
 	const int maxPacketAttempts = 50;
-	const int packetLength = usePacketNumber ? RFM73_MAX_PACKET_LEN - 1 : RFM73_MAX_PACKET_LEN;
+	const int packetLength = usePacketNumber ? RFM7x_MAX_PACKET_LEN - 1 : RFM7x_MAX_PACKET_LEN;
 	uint8_t packetNr = firstPacketNumber;
 	for (size_t i=0; i<length; i+=packetLength)
 	{				
@@ -649,7 +649,7 @@ TransmitResult internalSend(const uint8_t *buff, const size_t &length, bool requ
 			
 			if (usePacketNumber)
 			{			
-				uint8_t tmpBuff[RFM73_MAX_PACKET_LEN];
+				uint8_t tmpBuff[RFM7x_MAX_PACKET_LEN];
 				tmpBuff[0] = packetNr++;
 				memcpy(tmpBuff + 1, buff + i, MIN(length - i, packetLength));
 				buffToSend = tmpBuff;
@@ -659,7 +659,7 @@ TransmitResult internalSend(const uint8_t *buff, const size_t &length, bool requ
 				buffToSend = buff + i;
 			}
 			
-			const size_t bytesToSend = MIN(length - i + (usePacketNumber ? 1 : 0), RFM73_MAX_PACKET_LEN);
+			const size_t bytesToSend = MIN(length - i + (usePacketNumber ? 1 : 0), RFM7x_MAX_PACKET_LEN);
 			result += internalSendPacket(buffToSend, bytesToSend, maxTimeoutUs, requestAck);
 			
 			if (result.status == Success)
