@@ -278,7 +278,7 @@ void listen(Settings &settings)
 			}	
 			
 			// print dot '.' every ~10 KiB
-			if (settings.verbose && (packetCount % 330U) == 0)
+			if (settings.discard && (packetCount % 330U) == 0)
 			{
 				fprintf(stderr, ".");
 			}				
