@@ -90,8 +90,8 @@ struct Settings
 
 bool parseParams(const int argc, const char **argv, Settings &settings)
 {
-	settings.channel = 0;
-	settings.targetAddress = 0xCCCD1102UL;
+	settings.channel = 55;
+	settings.targetAddress = 0xAABB0001UL;
 	settings.listen = false;
 	settings.discard = false;
 	settings.ack = true;
