@@ -54,6 +54,9 @@ sig_atomic_t signaled = 0;
 
 static volatile bool _irq = false;
 
+static uint8_t singlePacket[32];
+static uint8_t singlePacketLength = 0;
+
 void irq (void)
 {
 	fprintf(stderr, "IRQ!\n");
@@ -64,15 +67,6 @@ void my_handler (int param)
 {
 	signaled = 1;
 }
-
-struct Packet
-{
-	uint32_t senderAddress;
-	uint32_t targetAddress;
-	uint32_t sensorId;
-	uint8_t dataLength;
-	uint8_t data[19];
-};
 
 struct Settings
 {
@@ -170,6 +164,38 @@ bool parseParams(const int argc, const char **argv, Settings &settings)
 					settings.registers.push_back(make_pair((uint8_t)ireg, (uint8_t)ival));
 				}
 			}
+		}
+		else if (string(argv[i]).substr(0, 3) == string("-p="))
+		{
+			string sbytes(string(argv[i]).substr(4));
+			if (sbytes.length() > 64)
+			{
+				printf("Single packet cannot be longer than 32 bytes (64 hex characters).\n");
+				return false;
+			}
+			
+			if (sbytes.length() % 2)
+			{
+				printf("Single packet is formatted as hex, so it must contain even number of hex characters (two per each byte).\n");
+				return false;
+			}
+			
+			for (uint8_t i=0;i<sbytes.length()/2;i++)
+			{
+				string ch(sbytes.substr(i*2, 2));
+				unsigned int x;
+				if (sscanf(ch.c_str(), "%2X", &x))
+				{
+					singlePacket[i] = (uint8_t)x;
+				}
+				else
+				{
+					printf("Unable to parse %s as hex byte.\n", ch.c_str());
+					return false;
+				}
+			}
+			
+			singlePacketLength = (uint8_t)(sbytes.length() / 2);
 		}
 		else
 		{
@@ -357,13 +383,25 @@ int main(const int argc, const char **argv)
 		
 	turnOn();
 	
-	if (settings.listen)
+	if (singlePacketLength)
 	{
-		listen(settings);
+		if (settings.verbose) fprintf(stderr, "Sending single packet, packet numbering and transmission end packet skipped.\n");
+		TransmitResult result = send(settings.channel, settings.targetAddress, singlePacket, singlePacket + singlePacketLength, settings.ack, false, 0);
+		if (result.status != Success)
+		{
+			fprintf(stderr, "An error occured while sending! (%u)\n", (int)result.status);
+		}
 	}
-	else
+	else 
 	{
-		transmit(settings);
+		if (settings.listen)
+		{
+			listen(settings);
+		}
+		else
+		{
+			transmit(settings);
+		}
 	}
 	
 	turnOff();
