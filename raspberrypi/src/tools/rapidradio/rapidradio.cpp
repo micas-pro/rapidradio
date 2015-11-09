@@ -4,7 +4,7 @@
 	rapidradio command line tool
 	
 	Author: Michal Okulski, the rapidradio team
-	Website: http://rapidradio.pl
+	Website: www.rapidradio.pl
 	Email: michal@rapidradio.pl
 	
 	Inspired by AVR's RFM70 libraries. 
@@ -167,7 +167,7 @@ bool parseParams(const int argc, const char **argv, Settings &settings)
 		}
 		else if (string(argv[i]).substr(0, 3) == string("-p="))
 		{
-			string sbytes(string(argv[i]).substr(4));
+			string sbytes(string(argv[i]).substr(3));
 			if (sbytes.length() > 64)
 			{
 				printf("Single packet cannot be longer than 32 bytes (64 hex characters).\n");
@@ -211,7 +211,7 @@ void usage()
 {
 	printf("rapidradio command-line tool\n\n");
 	printf("Usage:\n");
-	printf("sudo ./rapidradio [-l] [-ld] [-v] [-x] [-n] [-i] [-a=4_byte_hex_address] [-c=channel] [-nack] [-rN=1_byte_value]\n\n");
+	printf("sudo ./rapidradio [-l] [-ld] [-v] [-x] [-n] [-i] [-a=4_byte_hex_address] [-c=channel] [-nack] [-rN=1_byte_value] [-p=single_hex_packet]\n\n");
 	printf("-l\t\t\tListen mode - rapidradio will listen for incomming packets send to address specified by -a and channel set by -c.\n");
 	printf("-ld\t\t\tListen mode with discarded output - rapidradio will just print a dot '.' every ~10KiB received.\n");
 	printf("-v\t\t\tVerbose output.\n");
@@ -222,6 +222,7 @@ void usage()
 	printf("-c=channel\t\tRadio channel number, a value from range: 1 to 83.\n");
 	printf("-nack\t\t\tDon't expect ACKs when sending. Speeds up transmission but gives no guarantee that all packets reach the target device.\n");
 	printf("-rN=value\t\tManual setting for particular RFM's register. E.g. usage: to change auto-retry behavior to just 2 retries and 4ms interval use: -r4=242 which means: put 242 (decimal) value into the RFM's register no. 4 (decimal).\n");
+	printf("-p=single_hex_packet\tSends just one single packet. It must contain 1-32 bytes (hex formatted). Example: -p=AA1100FF will send 4-bytes long packet.\n");
 	printf("\n");
 }
 
