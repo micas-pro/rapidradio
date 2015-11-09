@@ -2,7 +2,7 @@
 	The rapidradio project
 	
 	Author: Michal Okulski, the rapidradio team
-	Website: www.rapidradio.pl
+	Website: http://rapidradio.pl
 	Email: michal@rapidradio.pl
 	
 	Inspired by AVR's RFM70 libraries. 
