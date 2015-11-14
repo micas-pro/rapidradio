@@ -226,13 +226,14 @@ void usage()
 	printf("\n");
 }
 
-void listen(Settings &settings)
+int listen(Settings &settings)
 {
 	if (settings.verbose) fprintf(stderr, "Listening...\n");
 	startListening(settings.channel, settings.targetAddress);
 	int32_t packetCount = -1;
 	uint8_t packetNumber = 0;
 	bool stop = false;
+	int retCode = 0;
 	while (!signaled && !stop)
 	{
 		// active wait for IRQ signal - it's faster than any user level interrupt implementation... ;(
@@ -311,9 +312,11 @@ void listen(Settings &settings)
 			}				
 		}			
 	}
+
+	return retCode;
 }
 
-void transmit(Settings &settings)
+int transmit(Settings &settings)
 {
 	freopen(NULL, "rb", stdin);
 	uint32_t totalSent = 0;
@@ -344,9 +347,15 @@ void transmit(Settings &settings)
 		{
 			fprintf(stderr, "An error occured while sending last packet! (%u)\n", (int)result.status);
 		}				
+
+		if (settings.verbose) fprintf(stderr, "Sent %uB (%uKiB, %uMiB)\n", totalSent, totalSent/1024U, totalSent/(1024U*1024U));
+
+		// Success
+		return 0;
 	}
 	
-	if (settings.verbose) fprintf(stderr, "Sent %uB (%uKiB, %uMiB)\n", totalSent, totalSent/1024U, totalSent/(1024U*1024U));
+	// Error
+	return 1;
 }
 
 int main(const int argc, const char **argv)
@@ -384,6 +393,7 @@ int main(const int argc, const char **argv)
 		
 	turnOn();
 	
+	int retCode = 0;
 	if (singlePacketLength)
 	{
 		if (settings.verbose) fprintf(stderr, "Sending single packet, packet numbering and transmission end packet skipped.\n");
@@ -397,11 +407,11 @@ int main(const int argc, const char **argv)
 	{
 		if (settings.listen)
 		{
-			listen(settings);
+			retCode = listen(settings);
 		}
 		else
 		{
-			transmit(settings);
+			retCode = transmit(settings);
 		}
 	}
 	
@@ -409,6 +419,6 @@ int main(const int argc, const char **argv)
 	bcm2835_spi_end();	
 	bcm2835_close();
 
-    return 0;
+    return retCode;
 }
 

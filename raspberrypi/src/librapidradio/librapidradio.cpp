@@ -553,6 +553,9 @@ bool checkStatusForMissingIRQ(uint8_t &status)
 
 TransmitResult internalSendPacket(const uint8_t *buff, const size_t &length, const uint32_t maxTimeoutUs, bool requestAck)
 {
+	// Due to a bug in RFM7x to re-enable IRQ on sending successfully (RFM7x_IRQ_STATUS_TX_DS) there is a need to flush the TX FIFO
+	flushTxFIFO();
+
 	const size_t toSendLength = MIN(length, RFM7x_MAX_PACKET_LEN);
 	sendPayload(buff, toSendLength, requestAck ? 1 : 0);
 	
@@ -632,7 +635,7 @@ TransmitResult internalSend(const uint8_t *buff, const size_t &length, bool requ
 	result.status = Success;
 	result.bytesSent = 0;
 	
-	const int maxPacketAttempts = 50;
+	const int maxPacketAttempts = 10;
 	const int packetLength = usePacketNumber ? RFM7x_MAX_PACKET_LEN - 1 : RFM7x_MAX_PACKET_LEN;
 	uint8_t packetNr = firstPacketNumber;
 	for (size_t i=0; i<length; i+=packetLength)
